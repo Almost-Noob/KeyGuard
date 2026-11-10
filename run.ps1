@@ -9,10 +9,10 @@ $root = $PSScriptRoot
 if (-not $root) {
     $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 }
-$python = Join-Path $root ".venv\Scripts\python.exe"
+$python = Join-Path $root ".conda\python.exe"
 
 if (-not (Test-Path $python)) {
-    throw "Python environment not found: $python. Rebuild .venv using the instructions in README.md."
+    throw "conda environment not found: $python. Create it with: conda create --prefix .conda python=3.12 -y"
 }
 
 $arguments = @((Join-Path $root "main.py"))

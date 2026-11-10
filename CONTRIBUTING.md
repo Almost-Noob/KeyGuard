@@ -4,35 +4,39 @@
 
 ## 开发环境
 
+项目使用仓库内的 Conda 环境 `.conda`，不使用 venv。
+
 ```powershell
 git clone https://github.com/Almost-Noob/KeyGuard.git
 cd KeyGuard
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe main.py
+
+# 如果仓库中已经有可用的 .conda 环境，跳过下一行
+conda create --prefix .conda python=3.12 -y
+
+.\.conda\python.exe -m pip install -r requirements.txt
+.\.conda\python.exe main.py
 ```
 
-Linux/macOS：
+Linux / macOS：
 
 ```bash
-python3 -m venv .venv
-. .venv/bin/activate
-python -m pip install -r requirements.txt
-python main.py
+conda create --prefix .conda python=3.12 -y
+.conda/bin/python -m pip install -r requirements.txt
+.conda/bin/python main.py
 ```
 
-不需要激活虚拟环境也可以直接调用解释器。
+不需要激活环境；直接调用 `.conda` 中的解释器即可。
 
 ## 提交前检查
 
 ```powershell
-.\.venv\Scripts\python.exe -m unittest discover -s tests -q
+.\.conda\python.exe -m unittest discover -s tests -q
 ```
 
 如果改动了 UI，请重新生成合成截图：
 
 ```powershell
-.\.venv\Scripts\python.exe tools\demo_screenshots.py
+.\.conda\python.exe tools\demo_screenshots.py
 ```
 
 并检查截图没有包含真实用户名、主机名、路径、指纹或密钥。
@@ -53,7 +57,7 @@ python main.py
 2. 保持提交信息清晰（例如 `feat: add certificate expiry audit`）
 3. 在 PR 描述中说明动机、行为和测试方式
 4. UI 改动请附截图（合成数据）
-5. 不要提交 `.venv`、`.conda`、`.tmp`、真实 `.ssh` 内容或任何密钥
+5. 不要提交 `.conda`、`.tmp`、真实 `.ssh` 内容或任何密钥
 
 ## 安全问题
 

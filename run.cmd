@@ -2,13 +2,13 @@
 setlocal
 cd /d "%~dp0"
 
-if not exist ".venv\Scripts\python.exe" (
-    echo [KeyGuard] Python environment not found:
-    echo   .venv\Scripts\python.exe
-    echo Please rebuild .venv using the instructions in README.md.
+if not exist ".conda\python.exe" (
+    echo [KeyGuard] conda environment not found:
+    echo   .conda\python.exe
+    echo Create it with: conda create --prefix .conda python=3.12 -y
     pause
     exit /b 1
 )
 
-".venv\Scripts\python.exe" "main.py" %*
+".conda\python.exe" "main.py" %*
 exit /b %ERRORLEVEL%

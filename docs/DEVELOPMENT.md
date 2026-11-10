@@ -13,6 +13,18 @@
 | 系统信息 | `psutil`、Windows Registry、CIM/WMI（带注册表兜底） |
 | 测试 | Python `unittest` + PySide6 offscreen |
 
+### 环境
+
+项目直接使用仓库内的 **Conda 环境 `.conda`**，不使用 venv：
+
+```powershell
+conda create --prefix .conda python=3.12 -y
+.\.conda\python.exe -m pip install -r requirements.txt
+.\run.cmd
+```
+
+已有 `.conda` 时跳过创建步骤。`run.cmd` / `run.ps1` 都直接调用 `.conda\python.exe`，不需要激活环境。
+
 目标平台是 Windows 10/11；SSH 扫描和密钥生成逻辑尽量保持跨平台。Windows 专属能力包括：
 
 - 读取 Machine GUID、ComputerHardwareId
@@ -345,7 +357,7 @@ SUBTITLE = "管理系统中的 SSH 密钥对与公钥授权"
 ## 8. 测试
 
 ```powershell
-.\.venv\Scripts\python.exe -m unittest discover -s tests -q
+.\.conda\python.exe -m unittest discover -s tests -q
 ```
 
 测试分层：
@@ -360,7 +372,7 @@ SUBTITLE = "管理系统中的 SSH 密钥对与公钥授权"
 截图由合成数据生成，不读取真实 SSH 目录或硬件：
 
 ```powershell
-.\.venv\Scripts\python.exe tools\demo_screenshots.py
+.\.conda\python.exe tools\demo_screenshots.py
 ```
 
 输出到 `docs/screenshots/`。脚本使用 `MainWindow(scan=..., device=...)` 注入演示数据。
@@ -372,8 +384,8 @@ SUBTITLE = "管理系统中的 SSH 密钥对与公钥授权"
 当前没有强制打包流程。临时构建可以使用 PyInstaller：
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install pyinstaller
-.\.venv\Scripts\python.exe -m PyInstaller --noconfirm --windowed --name KeyGuard --add-data "assets;assets" main.py
+.\.conda\python.exe -m pip install pyinstaller
+.\.conda\python.exe -m PyInstaller --noconfirm --windowed --name KeyGuard --add-data "assets;assets" main.py
 ```
 
 注意：
@@ -398,7 +410,7 @@ SUBTITLE = "管理系统中的 SSH 密钥对与公钥授权"
 
 如果工作区文件被 Windows 标记为 Low Mandatory Level，Python 进程会以低完整性运行，无法写入普通用户目录。表现为 PowerShell 可以写 `.ssh`，但 Python 报 `Permission denied`。
 
-处理：从普通桌面/终端启动 KeyGuard，或由管理员将 `.venv\Scripts\python.exe` 的完整性级别设为 Medium。这个限制来自运行环境，不是 KeyGuard 的文件权限逻辑。
+处理：从普通桌面/终端启动 KeyGuard，或由管理员将 `.conda\python.exe` 的完整性级别设为 Medium。这个限制来自运行环境，不是 KeyGuard 的文件权限逻辑。
 
 ### Git for Windows 看不到 Windows ssh-agent
 
@@ -414,20 +426,16 @@ Host github.com
 
 这样 Windows OpenSSH 和 Git 自带 SSH 都能直接使用密钥文件。
 
-### PowerShell 执行策略阻止 Activate.ps1
+### 启动方式与 PowerShell 执行策略
 
-直接运行 `.venv\Scripts\python.exe main.py` 或 `run.cmd`，不需要激活虚拟环境。也可以只在当前进程放开：
-
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-```
+直接运行 `.\.conda\python.exe main.py` 或 `run.cmd`，不需要激活 conda 环境，因此不受 PowerShell 的 `Activate.ps1` 执行策略影响。工作区 `.vscode/settings.json` 已关闭自动激活，并直接指向 `.conda\python.exe`。
 
 ## 13. 发布流程
 
 1. 更新 `README.md` / `CHANGELOG.md`
 2. 运行完整测试
 3. 重新生成合成截图
-4. 确认 `git status` 不包含 `.venv`、`.conda`、`.tmp`、真实密钥
+4. 确认 `git status` 不包含 `.conda`、`.tmp`、真实密钥
 5. 创建 tag（例如 `v1.0.0`）
 6. 推送 `main` 和 tag
 7. 在 GitHub Release 中附上变更说明
@@ -436,5 +444,5 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 ```powershell
 git status --short
-.\.venv\Scripts\python.exe -m unittest discover -s tests -q
+.\.conda\python.exe -m unittest discover -s tests -q
 ```

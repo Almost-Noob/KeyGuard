@@ -38,38 +38,52 @@ KeyGuard 把本机 SSH 身份、信任关系、设备标识和安全风险集中
 ### 环境要求
 
 - Python **3.11+**（开发环境使用 3.15）
+- Conda / Miniconda：项目直接使用仓库内的 `.conda` 环境，不使用 venv
 - Windows 10/11（完整功能的主要目标平台）
 - 可选：OpenSSH 客户端（Windows 通常已内置），用于读取版本、`ssh-agent` 和 `sshd` 状态
 
 ### Windows
 
+工作区已预置 `.conda` 环境时，直接安装依赖并启动：
+
 ```powershell
 git clone https://github.com/Almost-Noob/KeyGuard.git
 cd KeyGuard
 
-python -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.conda\python.exe -m pip install -r requirements.txt
+.\run.cmd
+```
 
+如果还没有 `.conda`，用 Conda 在仓库内创建同名环境（不是 venv）：
+
+```powershell
+conda create --prefix .conda python=3.12 -y
+.\.conda\python.exe -m pip install -r requirements.txt
 .\run.cmd
 ```
 
 也可以直接运行：
 
 ```powershell
-.\.venv\Scripts\python.exe main.py
+.\.conda\python.exe main.py
 ```
 
-**不需要先激活虚拟环境**。`run.cmd` 直接调用 `.venv` 解释器，因此不会触发 PowerShell 对 `Activate.ps1` 的执行策略检查。
+**不需要激活环境**。`run.cmd` 直接调用 `.conda\python.exe`，不依赖 `Activate.ps1` 或 PowerShell 执行策略。
 
 ### Linux / macOS
 
 ```bash
 git clone https://github.com/Almost-Noob/KeyGuard.git
 cd KeyGuard
-python3 -m venv .venv
-. .venv/bin/activate
-python -m pip install -r requirements.txt
-python main.py
+conda create --prefix .conda python=3.12 -y
+.conda/bin/python -m pip install -r requirements.txt
+.conda/bin/python main.py
+```
+
+如果已经有一个现成的 Conda 环境，也可以直接使用它的 Python：
+
+```bash
+conda run -n your-env python main.py
 ```
 
 ### 命令参数
@@ -82,7 +96,7 @@ python main.py
 示例：
 
 ```powershell
-.\.venv\Scripts\python.exe main.py --ssh-dir C:\Users\demo\.ssh --theme light
+.\.conda\python.exe main.py --ssh-dir C:\Users\demo\.ssh --theme light
 ```
 
 ## 使用说明
@@ -173,22 +187,22 @@ Windows registry / CIM / volume info ──> DeviceFingerprint ──> SHA-256 d
 ├── tests/                      # 单元测试 + UI smoke tests
 ├── tools/demo_screenshots.py   # 合成演示数据截图生成器
 ├── requirements.txt
-├── run.cmd                     # Windows 启动器（不依赖 PowerShell 激活）
+├── run.cmd                     # Windows 启动器（直接调用 .conda\python.exe）
 └── run.ps1
 ```
 
 ## 开发
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe -m unittest discover -s tests -q
+.\.conda\python.exe -m pip install -r requirements.txt
+.\.conda\python.exe -m unittest discover -s tests -q
 ```
 
 运行 UI 测试时建议使用 offscreen 平台：
 
 ```powershell
 $env:QT_QPA_PLATFORM = "offscreen"
-.\.venv\Scripts\python.exe -m unittest discover -s tests -v
+.\.conda\python.exe -m unittest discover -s tests -v
 ```
 
 代码风格：Python 3.11+、类型标注、4 空格缩进、UI 与 core 解耦。更多开发约定见 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)。
@@ -203,20 +217,15 @@ $env:QT_QPA_PLATFORM = "offscreen"
 
 ## 常见问题
 
-### VS Code 报 `Activate.ps1` 未签名
+### VS Code 没有使用 `.conda` 环境
 
-这是 PowerShell 执行策略拦截虚拟环境激活，不是应用错误。直接运行：
+项目不使用 venv。请确认 VS Code 选择：
 
-```powershell
-.\run.cmd
+```text
+.conda\python.exe
 ```
 
-或在当前 PowerShell 会话临时放开：
-
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-& .\.venv\Scripts\Activate.ps1
-```
+工作区已在 `.vscode/settings.json` 中设置 `python.defaultInterpreterPath`，并关闭自动激活。重载 VS Code 窗口后新开终端即可。
 
 ### GitHub 报 `Permission denied (publickey)`
 

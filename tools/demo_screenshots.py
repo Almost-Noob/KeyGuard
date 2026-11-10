@@ -1,8 +1,8 @@
 """Generate documentation screenshots from synthetic, non-personal data.
 
-Run from the repository root with the workspace interpreter:
+Run from the repository root with the workspace conda interpreter:
 
-    .\\.venv\\Scripts\\python.exe tools\\demo_screenshots.py
+    .\\.conda\\python.exe tools\\demo_screenshots.py
 """
 
 from __future__ import annotations
