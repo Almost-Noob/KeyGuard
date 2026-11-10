@@ -1,0 +1,33 @@
+# Local environments and scratch data
+.conda/
+.venv/
+.tmp/
+.pkgs/
+.env
+
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Build output
+build/
+dist/
+*.spec
+
+# Private keys and SSH material — never commit these
+.ssh/
+id_rsa*
+id_ed25519*
+id_ecdsa*
+*.pem
+*.key
+*.ppk
+
+# Editors / OS
+.idea/
+.DS_Store
+*.log
