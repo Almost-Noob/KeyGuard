@@ -20,10 +20,10 @@
 ```powershell
 conda create --prefix .conda python=3.12 -y
 .\.conda\python.exe -m pip install -r requirements.txt
-.\run.cmd
+.\.conda\python.exe main.py
 ```
 
-已有 `.conda` 时跳过创建步骤。`run.cmd` / `run.ps1` 都直接调用 `.conda\python.exe`，不需要激活环境。
+已有 `.conda` 时跳过创建步骤。直接调用 `.conda\python.exe`，不需要激活环境。
 
 目标平台是 Windows 10/11；SSH 扫描和密钥生成逻辑尽量保持跨平台。Windows 专属能力包括：
 
@@ -428,7 +428,7 @@ Host github.com
 
 ### 启动方式与 PowerShell 执行策略
 
-直接运行 `.\.conda\python.exe main.py` 或 `run.cmd`，不需要激活 conda 环境，因此不受 PowerShell 的 `Activate.ps1` 执行策略影响。工作区 `.vscode/settings.json` 已关闭自动激活，并直接指向 `.conda\python.exe`。
+直接运行 `.\.conda\python.exe main.py`，不需要激活 conda 环境，因此不受 PowerShell 的 `Activate.ps1` 执行策略影响。工作区 `.vscode/settings.json` 已关闭自动激活，并直接指向 `.conda\python.exe`。
 
 ## 13. 发布流程
 

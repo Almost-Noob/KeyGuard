@@ -5,21 +5,20 @@
 [![Tests](https://github.com/Almost-Noob/KeyGuard/actions/workflows/tests.yml/badge.svg)](https://github.com/Almost-Noob/KeyGuard/actions/workflows/tests.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11%2B-blue)](https://www.python.org/)
-[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)]()
 
-KeyGuard 把本机 SSH 身份、信任关系、设备标识和安全风险集中到一个现代桌面界面中。所有扫描、指纹计算和密钥生成都在本地完成，不上传密钥、指纹或扫描结果。
+KeyGuard 将本机 SSH 身份、信任关系、设备标识和安全风险集中到一个现代桌面界面中。所有扫描、指纹计算和密钥生成都在本地完成，不上传任何数据。
 
 ![KeyGuard 概览](docs/screenshots/overview.png)
 
 ## 功能
 
-- **主动扫描系统 SSH 状态**：读取 `~/.ssh` 下的私钥、公钥、SSH 证书、`known_hosts`、`authorized_keys` 和 `config`
-- **OpenSSH 环境识别**：客户端版本、`ssh-agent` 服务状态、本机 `sshd` 状态
-- **密钥分析**：SHA256 / MD5 指纹、算法、位数、口令保护、公私钥是否匹配、证书有效期、私钥 ACL 权限
-- **密钥生成**：Ed25519 / RSA / ECDSA，支持口令、注释、自定义目录、自动生成 `.pub`、限制私钥权限、加载到 ssh-agent
-- **设备指纹**：Machine ID、Windows 硬件 ID、系统盘序列号等稳定标识，SHA-256 主指纹、组件哈希、敏感信息遮罩
-- **安全审计**：弱算法、权限过宽、重复密钥、过期证书、known_hosts 撤销记录、高风险 SSH 配置、sshd 配置
-- **现代 UI**：深色/浅色主题、搜索、筛选、复制、Toast 提示、JSON 导出、键盘快捷键
+- 扫描 `~/.ssh`：私钥、公钥、证书、`known_hosts`、`authorized_keys`、SSH 配置
+- 识别 OpenSSH 版本、`ssh-agent` 和本机 `sshd` 状态
+- 解析 SHA256/MD5 指纹、算法、位数、口令保护、公私钥匹配和私钥权限
+- 生成 Ed25519 / RSA / ECDSA 密钥，支持口令、注释、`.pub`、ACL 限制和 `ssh-add`
+- 计算设备指纹：Machine ID、Windows 硬件 ID、系统盘序列号，支持遮罩和 JSON 导出
+- 安全审计：弱算法、权限过宽、重复密钥、过期证书、撤销主机密钥和危险配置
+- 深色/浅色主题、搜索、筛选、复制和快捷键
 
 ## 界面
 
@@ -31,59 +30,41 @@ KeyGuard 把本机 SSH 身份、信任关系、设备标识和安全风险集中
 | --- | --- |
 | ![生成密钥](docs/screenshots/generate-dialog.png) | ![浅色主题](docs/screenshots/light-overview.png) |
 
-> 截图使用 `tools/demo_screenshots.py` 生成的合成演示数据，不包含真实密钥、主机名或硬件标识。
+> 截图由 `tools/demo_screenshots.py` 使用合成数据生成，不包含真实密钥或设备标识。
+
+## 环境
+
+项目直接使用仓库内的 **Conda 环境 `.conda`**，不使用 venv，也不需要启动脚本或激活环境。
+
+- Python 3.11+（开发环境使用 3.15）
+- Windows 10/11 为完整功能的主要目标平台
+- OpenSSH 客户端可选，用于读取版本、`ssh-agent` 和 `sshd` 状态
 
 ## 快速开始
 
-### 环境要求
-
-- Python **3.11+**（开发环境使用 3.15）
-- Conda / Miniconda：项目直接使用仓库内的 `.conda` 环境，不使用 venv
-- Windows 10/11（完整功能的主要目标平台）
-- 可选：OpenSSH 客户端（Windows 通常已内置），用于读取版本、`ssh-agent` 和 `sshd` 状态
-
-### Windows
-
-工作区已预置 `.conda` 环境时，直接安装依赖并启动：
+已有 `.conda` 环境时：
 
 ```powershell
 git clone https://github.com/Almost-Noob/KeyGuard.git
 cd KeyGuard
-
 .\.conda\python.exe -m pip install -r requirements.txt
-.\run.cmd
-```
-
-如果还没有 `.conda`，用 Conda 在仓库内创建同名环境（不是 venv）：
-
-```powershell
-conda create --prefix .conda python=3.12 -y
-.\.conda\python.exe -m pip install -r requirements.txt
-.\run.cmd
-```
-
-也可以直接运行：
-
-```powershell
 .\.conda\python.exe main.py
 ```
 
-**不需要激活环境**。`run.cmd` 直接调用 `.conda\python.exe`，不依赖 `Activate.ps1` 或 PowerShell 执行策略。
+没有 `.conda` 时，先用 Conda 创建：
 
-### Linux / macOS
+```powershell
+conda create --prefix .conda python=3.12 -y
+.\.conda\python.exe -m pip install -r requirements.txt
+.\.conda\python.exe main.py
+```
+
+Linux / macOS：
 
 ```bash
-git clone https://github.com/Almost-Noob/KeyGuard.git
-cd KeyGuard
 conda create --prefix .conda python=3.12 -y
 .conda/bin/python -m pip install -r requirements.txt
 .conda/bin/python main.py
-```
-
-如果已经有一个现成的 Conda 环境，也可以直接使用它的 Python：
-
-```bash
-conda run -n your-env python main.py
 ```
 
 ### 命令参数
@@ -93,149 +74,63 @@ conda run -n your-env python main.py
 --theme dark|light 指定主题
 ```
 
-示例：
-
 ```powershell
 .\.conda\python.exe main.py --ssh-dir C:\Users\demo\.ssh --theme light
 ```
 
-## 使用说明
+## 文档
 
-### 密钥库
-
-- 左侧列出发现的密钥对和仅公钥文件，右侧展示指纹、路径、注释和公钥内容
-- “复制公钥”可直接粘贴到 GitHub / GitLab / 服务器 `authorized_keys`
-- 私钥内容不会显示在界面上
-- 生成密钥时推荐 Ed25519；需要兼容旧系统时选择 RSA 3072+
-- 无口令密钥可以勾选“生成后添加到 ssh-agent”；有口令密钥需要手动执行 `ssh-add`
-
-### 已知主机
-
-- 展示 `known_hosts` 中的服务器主机密钥、类型、指纹和标记
-- `@revoked`（已撤销）和 `@cert-authority`（CA）会单独标识
-- 点击复制按钮可以复制主机指纹
-
-### SSH 配置
-
-- 解析 `~/.ssh/config` 中的 `Host`、`HostName`、`User`、`Port`、`IdentityFile`、`ProxyJump` 等
-- 支持 `Include`
-- 可查看原始配置文本
-
-### 设备指纹
-
-- 从稳定硬件标识计算 SHA-256 主指纹
-- 默认遮罩敏感字段，勾选“显示敏感信息”后可查看和复制
-- 可导出包含原始标识的 JSON；导出文件属于敏感数据
-
-### 安全检查
-
-| 等级 | 示例 |
-| --- | --- |
-| 严重 | DSA 密钥、已知主机密钥被撤销、公私钥不匹配 |
-| 建议 | 私钥无口令、私钥权限过宽、RSA 小于 3072 位、危险 SSH 配置 |
-| 提示 | 仅有公钥、agent 未运行、证书尚未生效 |
-
-评分公式：`100 - 严重 × 24 - 建议 × 8`，最低 8 分。
-
-## 工作原理
-
-```text
-~/.ssh ──> SSH scanner ──> KeyRecord / KnownHost / HostConfig / Finding
-                │
-                ├── OpenSSH wire format parser（指纹、位数、证书）
-                ├── Private key header parser（算法、是否加密）
-                └── Audit rules ──> score / grade
-
-Windows registry / CIM / volume info ──> DeviceFingerprint ──> SHA-256 device_id
-```
-
-核心实现：
-
-- [app/core/ssh.py](app/core/ssh.py)：扫描、公钥/私钥解析、known_hosts、SSH config、authorized_keys、审计、密钥生成
-- [app/core/device.py](app/core/device.py)：设备标识采集、注册表兜底、稳定指纹计算
-- [app/ui/](app/ui/)：PySide6 界面、页面、主题和组件
-
-更详细的设计说明见 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)。
-
-## 安全与隐私
-
-- 所有数据仅在本机处理，没有遥测、云端同步或网络上传
-- 私钥内容不会渲染到 UI，只读取结构以计算公钥和指纹
-- 设备指纹默认遮罩敏感字段；导出的 JSON 包含原始硬件标识
-- 生成密钥后尝试在 Windows 上把私钥 ACL 限制为当前用户、SYSTEM 和 Administrators
-- 不要把真实私钥、导出指纹或 `.ssh` 目录提交到仓库
-
-更多内容见 [SECURITY.md](SECURITY.md)。
+- [开发文档](docs/DEVELOPMENT.md)：架构、模块、SSH 解析、设备指纹算法、UI 约定、测试和发布流程
+- [安全策略](SECURITY.md)：数据边界、密钥处理、威胁模型和漏洞报告
+- [贡献指南](CONTRIBUTING.md)：开发环境、代码约定和 PR 流程
+- [变更记录](CHANGELOG.md)
 
 ## 项目结构
 
 ```text
 .
-├── main.py                     # 应用入口
+├── main.py
 ├── app/
-│   ├── core/
-│   │   ├── ssh.py              # SSH 扫描、解析、审计、密钥生成
-│   │   └── device.py           # 设备指纹采集
-│   └── ui/
-│       ├── main_window.py      # 主窗口、导航、扫描调度
-│       ├── theme.py            # 设计令牌、QSS、深色/浅色主题
-│       ├── widgets.py          # 通用 UI 组件
-│       ├── dialogs.py          # 生成密钥对话框
-│       └── pages/              # 概览、密钥库、已知主机、配置、指纹、审计
-├── assets/                     # Logo、图标资源
-├── docs/                       # 开发文档与截图
-├── tests/                      # 单元测试 + UI smoke tests
-├── tools/demo_screenshots.py   # 合成演示数据截图生成器
+│   ├── core/          # SSH 扫描、解析、审计、密钥生成、设备指纹
+│   └── ui/            # 主窗口、主题、组件、页面、对话框
+├── assets/            # Logo 和图标
+├── docs/              # 开发文档与合成截图
+├── tests/             # 单元测试和 UI smoke tests
+├── tools/             # 文档截图生成器
 ├── requirements.txt
-├── run.cmd                     # Windows 启动器（直接调用 .conda\python.exe）
-└── run.ps1
+└── pyproject.toml     # Ruff 配置
 ```
 
-## 开发
+## 开发与测试
 
 ```powershell
-.\.conda\python.exe -m pip install -r requirements.txt
+.\.conda\python.exe -m pip install -r requirements-dev.txt
 .\.conda\python.exe -m unittest discover -s tests -q
+.\.conda\python.exe -m ruff check main.py app tests tools
 ```
 
-运行 UI 测试时建议使用 offscreen 平台：
+UI 测试建议使用 offscreen：
 
 ```powershell
 $env:QT_QPA_PLATFORM = "offscreen"
 .\.conda\python.exe -m unittest discover -s tests -v
 ```
 
-代码风格：Python 3.11+、类型标注、4 空格缩进、UI 与 core 解耦。更多开发约定见 [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)。
+## 安全与隐私
 
-## 已知限制
+- 所有扫描、指纹计算和密钥生成均在本地完成，无遥测或云端同步
+- 私钥内容不会显示在 UI 中；只解析结构以计算指纹
+- 设备指纹默认遮罩敏感字段；导出 JSON 包含原始硬件标识，请按敏感数据处理
+- 生成密钥后尝试用 Windows ACL 将私钥限制为当前用户、SYSTEM 和 Administrators
+- 不要提交真实私钥、设备指纹或 `.ssh` 目录
 
-- Windows 的私钥 ACL 修复依赖 `icacls`；非 Windows 平台使用 `chmod 600`
-- `known_hosts` 中的哈希主机名无法还原为明文
-- SSH 证书解析覆盖公开字段和有效期，不验证 CA 链
-- 本应用不删除密钥文件，避免误操作
-- 设备指纹不是硬件级 TPM 证明，重装系统或更换硬件后可能变化
+详见 [SECURITY.md](SECURITY.md)。
 
 ## 常见问题
 
-### VS Code 没有使用 `.conda` 环境
+### Git 报 `Permission denied (publickey)`
 
-项目不使用 venv。请确认 VS Code 选择：
-
-```text
-.conda\python.exe
-```
-
-工作区已在 `.vscode/settings.json` 中设置 `python.defaultInterpreterPath`，并关闭自动激活。重载 VS Code 窗口后新开终端即可。
-
-### GitHub 报 `Permission denied (publickey)`
-
-确认：
-
-1. 公钥已添加到 GitHub：<https://github.com/settings/keys>
-2. `~/.ssh/config` 为 `github.com` 指定了正确的 `IdentityFile`
-3. `ssh -T git@github.com` 显示 `successfully authenticated`
-
-如果 Git for Windows 使用自带的 `ssh.exe`，它可能看不到 Windows `ssh-agent` 中的密钥；在 `~/.ssh/config` 中显式指定 `IdentityFile` 可以同时兼容两套客户端。
+确认公钥已添加到 GitHub，并在 `~/.ssh/config` 中显式指定 `github.com` 使用的 `IdentityFile`。Git for Windows 自带的 `ssh.exe` 可能看不到 Windows `ssh-agent` 中的密钥。
 
 ### `ssh-agent` 未运行
 
@@ -247,14 +142,6 @@ Start-Service ssh-agent
 ssh-add $env:USERPROFILE\.ssh\id_ed25519
 ssh-add -l
 ```
-
-## 贡献
-
-欢迎提交 issue 和 pull request。请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。提交前确保：
-
-- `python -m unittest discover -s tests` 通过
-- 不包含真实密钥、设备指纹或个人路径
-- UI 改动附带截图（使用合成演示数据）
 
 ## License
 

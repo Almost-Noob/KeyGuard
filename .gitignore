@@ -1,17 +1,22 @@
-# Local environments and scratch data
+# Conda environment (workspace-provided, never commit)
 .conda/
-.venv/
+
+# Scratch data and local caches
 .tmp/
 .pkgs/
 .env
-
-# Python caches
+.env.*
 __pycache__/
 *.py[cod]
 .pytest_cache/
 .ruff_cache/
+.mypy_cache/
 .coverage
 htmlcov/
+*.log
+*.bak
+*.orig
+*.rej
 
 # Build output
 build/
@@ -29,5 +34,8 @@ id_ecdsa*
 
 # Editors / OS
 .idea/
+.vscode/*
+!.vscode/settings.json
 .DS_Store
-*.log
+Thumbs.db
+desktop.ini
